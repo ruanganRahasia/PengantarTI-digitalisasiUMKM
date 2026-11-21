@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayam Geprek Gambiran Lumajang - Pesan Antar, Akun & Lacak Kurir</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        chili: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                        },
+                        golden: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        cream: '#fffbf7'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-cream text-gray-800 font-sans antialiased selection:bg-chili-600 selection:text-white">
+
+    <!-- Notifikasi Toast (Pengganti Alert) -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- 1. HEADER & NAVIGASI -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-orange-100 shadow-sm transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo Brand -->
+                <a href="#beranda" class="flex items-center gap-3 group">
+                    <div class="w-11 h-11 bg-gradient-to-br from-chili-600 to-golden-500 rounded-xl flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-fire-flame-curved text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="font-display font-extrabold text-lg sm:text-xl tracking-tight text-gray-900 block leading-none">
+                            Ayam Geprek <span class="text-chili-600">Gambiran</span>
+                        </span>
+                        <span class="text-[11px] sm:text-xs font-medium text-amber-600 tracking-wide">Jl. Raya Gambiran • Lumajang</span>
+                    </div>
+                </a>
+
+                <!-- Navigasi Desktop -->
+                <nav class="hidden lg:flex items-center space-x-7">
+                    <a href="#beranda" class="text-sm font-semibold text-gray-700 hover:text-chili-600 transition-colors">Beranda</a>
+                    <a href="#menu" class="text-sm font-semibold text-gray-700 hover:text-chili-600 transition-colors">Daftar Menu</a>
+                    <a href="#lokasi" class="text-sm font-semibold text-gray-700 hover:text-chili-600 transition-colors">Jam & Lokasi</a>
+                </nav>
+
+                <!-- Action Buttons: Pesanan & Lacak, Akun Saya, Keranjang -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- Tombol Riwayat & Lacak Pesanan -->
+                    <button onclick="openTrackingModal()" class="relative inline-flex items-center gap-2 bg-orange-50 hover:bg-orange-100 text-gray-800 border border-orange-200 px-3 sm:px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all active:scale-95" title="Riwayat & Lacak Pesanan">
+                        <i class="fa-solid fa-motorcycle text-chili-600 text-base"></i>
+                        <span class="hidden md:inline">Pesanan & Lacak</span>
+                        <span id="active-order-badge" class="hidden bg-chili-600 text-white font-extrabold text-[11px] px-1.5 py-0.5 rounded-full min-w-[20px] text-center animate-pulse">0</span>
+                    </button>
+
+                    <!-- Tombol Akun Saya (Cookie & Session) -->
+                    <button onclick="openAccountModal()" class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 px-3 sm:px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm shadow-2xs transition-all active:scale-95">
+                        <div id="nav-account-avatar" class="w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">
+                            <i class="fa-regular fa-user"></i>
+                        </div>
+                        <span id="nav-account-name" class="hidden sm:inline max-w-[100px] truncate">Akun Saya</span>
+                    </button>
+
+                    <!-- Tombol Keranjang -->
+                    <button onclick="toggleCartDrawer()" class="relative inline-flex items-center gap-2 bg-chili-600 hover:bg-chili-700 text-white px-3.5 sm:px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm shadow-md shadow-chili-600/20 transition-all active:scale-95">
+                        <i class="fa-solid fa-bag-shopping text-base"></i>
+                        <span class="hidden sm:inline">Keranjang</span>
+                        <span id="cart-badge" class="bg-golden-400 text-gray-900 font-extrabold text-xs px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
+                    </button>
+
+                    <!-- Tombol Hamburger Mobile -->
+                    <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl text-gray-600 hover:bg-orange-50 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dropdown Navigasi Mobile -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-orange-100 px-4 pt-2 pb-4 space-y-1 shadow-lg">
+            <a href="#beranda" onclick="toggleMobileMenu()" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-orange-50 hover:text-chili-600">Beranda</a>
+            <a href="#menu" onclick="toggleMobileMenu()" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-orange-50 hover:text-chili-600">Daftar Menu</a>
+            <a href="#lokasi" onclick="toggleMobileMenu()" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-orange-50 hover:text-chili-600">Jam & Lokasi</a>
+            <button onclick="toggleMobileMenu(); openTrackingModal();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold text-chili-600 hover:bg-orange-50 flex items-center justify-between">
+                <span><i class="fa-solid fa-motorcycle mr-2"></i>Pesanan & Lacak Pengantaran</span>
+                <span id="mobile-active-badge" class="hidden bg-chili-600 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+            </button>
+            <button onclick="toggleMobileMenu(); openAccountModal();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-orange-50">
+                <i class="fa-regular fa-user mr-2 text-amber-600"></i>Profil Akun & Pengaturan Cookie
+            </button>
+        </div>
+    </header>
+
+    <!-- BANNER MINI PELACAKAN AKTIF (Muncul otomatis jika ada pesanan belum selesai di session/cookie) -->
+    <div id="live-tracking-banner" class="hidden bg-gradient-to-r from-gray-900 via-gray-800 to-chili-900 text-white border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <span class="flex h-3 w-3 relative shrink-0">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-golden-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-golden-500"></span>
+                </span>
+                <div class="text-xs sm:text-sm">
+                    <span class="text-golden-400 font-bold" id="banner-order-id">#AGG-0000</span>
+                    <span class="mx-1.5 text-gray-400">•</span>
+                    <span id="banner-status-text" class="font-medium">Kurir sedang mengantar pesananmu...</span>
+                </div>
+            </div>
+            <button onclick="openTrackingModal()" class="w-full sm:w-auto text-xs font-bold bg-golden-400 hover:bg-golden-500 text-gray-900 px-4 py-1.5 rounded-lg transition-colors shrink-0">
+                Lacak Posisi Kurir <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. HERO SECTION -->
+    <section id="beranda" class="relative overflow-hidden bg-gradient-to-br from-orange-50 via-cream to-red-50/60 pt-10 pb-16 lg:py-20">
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-golden-400/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 -left-24 w-80 h-80 bg-chili-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+                
+                <!-- Kolom Teks Hero -->
+                <div class="lg:col-span-7 text-center lg:text-left space-y-6">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-100 text-chili-700 text-xs sm:text-sm font-bold tracking-wide">
+                        <span class="w-2 h-2 rounded-full bg-chili-600 animate-ping"></span>
+                        <span>Gratis Ongkir Area Gambiran & Lumajang Kota!</span>
+                    </div>
+
+                    <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-gray-900 leading-[1.15]">
+                        Kriuknya Bikin Nagih, <br class="hidden sm:inline">
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-chili-600 to-golden-500">
+                            Sambalnya Bikin Melek!
+                        </span>
+                    </h1>
+
+                    <p class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                        Ayam krispi hangat digeprek langsung di atas cobek batu dengan cabai segar pilihan khas <strong>Gambiran, Lumajang</strong>. Pilih level pedas 0–5, simpan akunmu otomatis, dan pantau posisi kurir hingga depan pintu!
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
+                        <a href="#menu" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-chili-600 to-chili-700 hover:from-chili-700 hover:to-chili-800 text-white font-bold px-7 py-4 rounded-2xl shadow-lg shadow-chili-600/30 transition-all hover:-translate-y-0.5">
+                            <span>Pesan Sekarang</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                        <button onclick="openTrackingModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-orange-50 text-gray-800 font-semibold px-6 py-4 rounded-2xl border border-orange-200 shadow-sm transition-all">
+                            <i class="fa-solid fa-route text-chili-600"></i>
+                            <span>Lacak & Riwayat Pesanan</span>
+                        </button>
+                    </div>
+
+                    <!-- Highlight Keunggulan -->
+                    <div class="grid grid-cols-3 gap-4 pt-6 border-t border-orange-200/60 max-w-lg mx-auto lg:mx-0">
+                        <div>
+                            <p class="font-display font-extrabold text-xl sm:text-2xl text-gray-900">100%</p>
+                            <p class="text-xs text-gray-500 font-medium">Ayam Segar Halal</p>
+                        </div>
+                        <div>
+                            <p class="font-display font-extrabold text-xl sm:text-2xl text-chili-600">Lvl 0-5</p>
+                            <p class="text-xs text-gray-500 font-medium">Bebas Pilih Pedas</p>
+                        </div>
+                        <div>
+                            <p class="font-display font-extrabold text-xl sm:text-2xl text-golden-600">Live Track</p>
+                            <p class="text-xs text-gray-500 font-medium">Pantau Kurir Antar</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kolom Ilustrasi Hero -->
+                <div class="lg:col-span-5 relative">
+                    <div class="relative mx-auto max-w-md lg:max-w-full">
+                        <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-gradient-to-br from-amber-500 to-chili-600 aspect-[4/3] flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80" 
+                                 alt="Ayam Geprek Spesial Gambiran Lumajang" 
+                                 onerror="this.onerror=null; this.src='https://placehold.co/800x600/dc2626/ffffff?text=Ayam+Geprek+Gambiran';"
+                                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                            
+                            <div class="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-lg flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-lg">
+                                        🔥
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-sm text-gray-900">Best Seller: Geprek Mozzarella</p>
+                                        <p class="text-xs text-gray-500">Keju lumer melimpah + Sambal Bawang</p>
+                                    </div>
+                                </div>
+                                <span class="font-display font-extrabold text-chili-600 text-sm">Rp 18rb</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. KATALOG MENU AYAM GEPREK & PELENGKAP -->
+    <section id="menu" class="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+            <span class="text-chili-600 font-bold text-sm uppercase tracking-wider">Pilihan Menu Favorit</span>
+            <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-gray-900 mt-1">Pilih Paket & Atur Level Pedasmu</h2>
+            <p class="text-gray-600 mt-3 text-sm sm:text-base">Semua paket ayam geprek sudah termasuk nasi putih hangat, lalapan segar, dan pilihan sambal ulek dadakan.</p>
+        </div>
+
+        <!-- Filter Kategori -->
+        <div class="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 mb-10" id="category-filters">
+            <button onclick="filterMenu('semua')" data-cat="semua" class="cat-btn active px-5 py-2.5 rounded-xl font-semibold text-sm transition-all bg-chili-600 text-white shadow-md shadow-chili-600/20">
+                Semua Menu
+            </button>
+            <button onclick="filterMenu('paket')" data-cat="paket" class="cat-btn px-5 py-2.5 rounded-xl font-semibold text-sm transition-all bg-white text-gray-700 hover:bg-orange-50 border border-orange-200">
+                🍗 Paket Ayam Geprek
+            </button>
+            <button onclick="filterMenu('lauk')" data-cat="lauk" class="cat-btn px-5 py-2.5 rounded-xl font-semibold text-sm transition-all bg-white text-gray-700 hover:bg-orange-50 border border-orange-200">
+                🍳 Lauk & Camilan
+            </button>
+            <button onclick="filterMenu('minuman')" data-cat="minuman" class="cat-btn px-5 py-2.5 rounded-xl font-semibold text-sm transition-all bg-white text-gray-700 hover:bg-orange-50 border border-orange-200">
+                🥤 Minuman Segar
+            </button>
+        </div>
+
+        <!-- Grid Daftar Menu -->
+        <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Kartu menu dirender via JS -->
+        </div>
+    </section>
+
+    <!-- 4. INFORMASI JAM OPERASIONAL & LOKASI LENGKAP (JL. RAYA GAMBIRAN, LUMAJANG) -->
+    <section id="lokasi" class="py-16 lg:py-24 bg-white border-t border-orange-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="text-chili-600 font-bold text-sm uppercase tracking-wider">Kunjungi Kedai Kami</span>
+                <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-gray-900 mt-1">Jam Operasional & Lokasi Lumajang</h2>
+                <p class="text-gray-600 mt-2 text-sm sm:text-base">Mampir langsung untuk makan di tempat (Dine-In) atau pesan antar cepat ke seluruh area Gambiran & Lumajang.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                <!-- Kartu Informasi Jam & Alamat -->
+                <div class="lg:col-span-5 bg-cream rounded-3xl p-6 sm:p-8 border border-orange-100 shadow-sm flex flex-col justify-between space-y-6">
+                    <div>
+                        <!-- Status Real-time Buka / Tutup -->
+                        <div class="flex items-center justify-between pb-5 border-b border-orange-200/70">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Status Kedai Saat Ini</p>
+                                <p id="current-time-display" class="text-xs text-gray-500 mt-0.5">Memuat waktu WIB...</p>
+                            </div>
+                            <div id="store-status-badge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>BUKA SEKARANG</span>
+                            </div>
+                        </div>
+
+                        <!-- Jadwal Operasional -->
+                        <div class="mt-6 space-y-3">
+                            <h3 class="font-display font-bold text-lg text-gray-900 flex items-center gap-2">
+                                <i class="fa-regular fa-clock text-chili-600"></i>
+                                <span>Jam Operasional</span>
+                            </h3>
+                            <div class="bg-white rounded-2xl p-4 border border-orange-100 space-y-2 text-sm">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-gray-700">Senin - Minggu (Setiap Hari)</span>
+                                    <span class="font-bold text-gray-900">10:00 - 22:00 WIB</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-gray-100 text-xs text-gray-500">
+                                    <span>Last Order Pesan Antar</span>
+                                    <span class="font-semibold text-chili-600">21:30 WIB</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detail Alamat & Kontak -->
+                        <div class="mt-6 space-y-4">
+                            <h3 class="font-display font-bold text-lg text-gray-900 flex items-center gap-2">
+                                <i class="fa-solid fa-map-location-dot text-chili-600"></i>
+                                <span>Alamat & Kontak</span>
+                            </h3>
+                            <div class="space-y-3 text-sm text-gray-600">
+                                <div class="flex items-start gap-3">
+                                    <i class="fa-solid fa-location-pin text-chili-600 mt-1"></i>
+                                    <div>
+                                        <p class="font-bold text-gray-900">Ayam Geprek Gambiran - Lumajang</p>
+                                        <p class="leading-relaxed">Jl. Raya Gambiran No. 45, Gambiran, Kec. Lumajang, Kabupaten Lumajang, Jawa Timur 67316</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i>
+                                    <span class="font-semibold text-gray-800">+62 812-3456-7890 (Admin Pesan Antar)</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-motorcycle text-amber-600"></i>
+                                    <span>Gratis Ongkir radius 3 km area Gambiran</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Buka Google Maps -->
+                    <a href="https://www.google.com/maps/search/?api=1&query=Jl.+Raya+Gambiran+Lumajang+Jawa+Timur" target="_blank" rel="noopener noreferrer" 
+                       class="w-full inline-flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-bold py-3.5 px-6 rounded-2xl shadow-md transition-all">
+                        <i class="fa-solid fa-diamond-turn-right text-golden-400"></i>
+                        <span>Buka Rute di Google Maps</span>
+                    </a>
+                </div>
+
+                <!-- Tampilan Peta Visual Interaktif Lumajang -->
+                <div class="lg:col-span-7 rounded-3xl overflow-hidden border border-orange-200 shadow-sm relative min-h-[360px] bg-orange-50 flex flex-col">
+                    <div class="bg-white px-5 py-3 border-b border-orange-100 flex items-center justify-between text-xs text-gray-500">
+                        <span class="font-semibold text-gray-700"><i class="fa-solid fa-map text-chili-600 mr-1.5"></i> Peta Lokasi Kedai (Gambiran, Lumajang)</span>
+                        <span>Koordinat: -8.1335° S, 113.2248° E</span>
+                    </div>
+                    
+                    <div class="relative flex-grow w-full h-full min-h-[320px]">
+                        <iframe 
+                            title="Lokasi Ayam Geprek Gambiran Lumajang"
+                            class="w-full h-full min-h-[320px] border-0"
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.openstreetmap.org/export/embed.html?bbox=113.2100%2C-8.1450%2C113.2400%2C-8.1200&amp;layer=mapnik&amp;marker=-8.1335%2C113.2248">
+                        </iframe>
+                        
+                        <div class="absolute bottom-4 left-4 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl shadow-lg border border-orange-100 max-w-xs">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-full bg-chili-600 text-white flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-utensils text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-xs text-gray-900">Ayam Geprek Gambiran</p>
+                                    <p class="text-[11px] text-gray-500">Jl. Raya Gambiran, Lumajang, Jatim</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-gray-300 py-10 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-chili-600 rounded-xl flex items-center justify-center text-white">
+                    <i class="fa-solid fa-fire-flame-curved"></i>
+                </div>
+                <div>
+                    <span class="font-display font-bold text-lg text-white block leading-none">Ayam Geprek Gambiran</span>
+                    <span class="text-[11px] text-gray-400">Jl. Raya Gambiran, Lumajang, Jawa Timur</span>
+                </div>
+            </div>
+            <p class="text-xs text-gray-400 text-center sm:text-right">
+                &copy; 2026 Ayam Geprek Gambiran Lumajang. Halal, Higienis & Pedasnya Nampol.
+            </p>
+        </div>
+    </footer>
+
+    <!-- 5. DRAWER KERANJANG & FORM PEMESANAN -->
+    <div id="cart-overlay" onclick="toggleCartDrawer()" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden transition-opacity"></div>
+    
+    <aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="px-6 py-5 bg-gradient-to-r from-chili-600 to-chili-700 text-white flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-bag-shopping text-xl text-golden-400"></i>
+                <div>
+                    <h3 class="font-display font-bold text-lg leading-tight">Keranjang Pesanan</h3>
+                    <p class="text-xs text-red-100" id="drawer-item-count">0 item dipilih • Tersimpan di Sesi</p>
+                </div>
+            </div>
+            <button onclick="toggleCartDrawer()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <div class="flex-grow overflow-y-auto p-6 space-y-6">
+            <!-- Daftar Item Keranjang -->
+            <div id="cart-items-container" class="space-y-3"></div>
+
+            <!-- Form Pemesanan -->
+            <div id="checkout-form-section" class="hidden space-y-5 pt-4 border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h4 class="font-display font-bold text-base text-gray-900">Detail Pemesanan</h4>
+                    <span id="autofill-badge" class="hidden text-[11px] font-semibold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-200">
+                        <i class="fa-solid fa-cookie-bite mr-1"></i>Terisi dari Akun
+                    </span>
+                </div>
+
+                <!-- Pilihan Metode Pemesanan -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Metode Pemesanan</label>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button type="button" id="btn-delivery" onclick="setOrderMethod('delivery')" class="method-btn active py-3 px-3 rounded-xl border-2 border-chili-600 bg-chili-50 text-chili-700 font-bold text-xs flex flex-col items-center gap-1 transition-all">
+                            <i class="fa-solid fa-motorcycle text-base"></i>
+                            <span>Pesan Antar (Delivery)</span>
+                        </button>
+                        <button type="button" id="btn-takeaway" onclick="setOrderMethod('takeaway')" class="method-btn py-3 px-3 rounded-xl border-2 border-gray-200 bg-white text-gray-600 font-bold text-xs flex flex-col items-center gap-1 transition-all">
+                            <i class="fa-solid fa-store text-base"></i>
+                            <span>Ambil di Tempat</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pilihan Area Ongkir -->
+                <div id="delivery-area-group" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1.5">Area Pengiriman (Lumajang) *</label>
+                        <select id="delivery-zone" onchange="updateCartSummary()" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-chili-500 focus:border-chili-500 outline-none bg-white">
+                            <option value="0">Area Gambiran & Sekitarnya (Gratis Ongkir - Rp 0)</option>
+                            <option value="5000">Area Lumajang Kota / Rogotrunan / Tompokersan (+ Rp 5.000)</option>
+                            <option value="8000">Area Labruk / Sukodono / Kunir (+ Rp 8.000)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1.5">Alamat Lengkap Pengiriman *</label>
+                        <textarea id="cust-address" rows="2" placeholder="Contoh: Jl. Raya Gambiran Gg. II No. 14, Lumajang" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-chili-500 focus:border-chili-500 outline-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- Data Diri Pemesan -->
+                <div class="grid grid-cols-1 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1.5">Nama Lengkap *</label>
+                        <input type="text" id="cust-name" placeholder="Masukkan nama Anda" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-chili-500 focus:border-chili-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1.5">Nomor WhatsApp *</label>
+                        <input type="tel" id="cust-phone" placeholder="Contoh: 08123456789" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-chili-500 focus:border-chili-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1.5">Catatan Tambahan (Opsional)</label>
+                        <input type="text" id="cust-notes" placeholder="Contoh: Banyakin kremesan, sambal dipisah..." class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-chili-500 focus:border-chili-500 outline-none">
+                    </div>
+                </div>
+
+                <!-- Checkbox Simpan Data ke Akun Cookie -->
+                <label class="flex items-center gap-2.5 text-xs text-gray-600 bg-orange-50/80 p-3 rounded-xl border border-orange-100 cursor-pointer">
+                    <input type="checkbox" id="save-to-cookie-cb" checked class="w-4 h-4 text-chili-600 rounded focus:ring-chili-500">
+                    <span>Simpan data nama & alamat ini ke Akun (Cookie) untuk pesanan berikutnya</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Footer Drawer -->
+        <div id="cart-footer" class="hidden p-6 bg-gray-50 border-t border-gray-200 space-y-4 shrink-0">
+            <div class="space-y-1.5 text-sm">
+                <div class="flex justify-between text-gray-600">
+                    <span>Subtotal Pesanan</span>
+                    <span id="summary-subtotal" class="font-semibold text-gray-900">Rp 0</span>
+                </div>
+                <div class="flex justify-between text-gray-600" id="summary-shipping-row">
+                    <span>Ongkos Kirim</span>
+                    <span id="summary-shipping" class="font-semibold text-emerald-600">Gratis (Rp 0)</span>
+                </div>
+                <div class="flex justify-between text-base font-extrabold text-gray-900 pt-2 border-t border-gray-200">
+                    <span>Total Pembayaran</span>
+                    <span id="summary-total" class="text-chili-600">Rp 0</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-2.5">
+                <button onclick="processOrder('whatsapp')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all active:scale-98">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>Pesan & Kirim via WhatsApp</span>
+                </button>
+                <button onclick="processOrder('receipt')" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-receipt text-golden-400"></i>
+                    <span>Buat Pesanan & Lacak Langsung</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 6. MODAL AKUN PELANGGAN (COOKIE & SESSION MANAGEMENT) -->
+    <div id="account-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <!-- Header Modal -->
+            <div class="px-6 py-5 bg-gradient-to-r from-gray-900 to-gray-800 text-white flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-golden-400 text-gray-900 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-lg leading-tight">Akun Pelanggan</h3>
+                        <p class="text-xs text-gray-300">Tersimpan otomatis via Cookie & Session</p>
+                    </div>
+                </div>
+                <button onclick="closeAccountModal()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Konten Modal Akun -->
+            <div class="p-6 overflow-y-auto space-y-6">
+                <!-- Status Teknis Cookie & Session -->
+                <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved text-amber-600"></i> Status Penyimpanan Lokal
+                        </span>
+                        <span id="session-status-pill" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                            Sesi Aktif
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-1 text-[11px] text-gray-700">
+                        <div class="bg-white p-2.5 rounded-xl border border-amber-100">
+                            <p class="text-gray-400 font-semibold">Browser Cookie</p>
+                            <p id="tech-cookie-info" class="font-bold text-gray-800 mt-0.5 truncate">Belum terdaftar</p>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-amber-100">
+                            <p class="text-gray-400 font-semibold">Session Storage</p>
+                            <p id="tech-session-info" class="font-bold text-gray-800 mt-0.5 truncate">ID Sesi: -</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Profil Pelanggan -->
+                <form id="account-form" onsubmit="saveCustomerAccount(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Nama Lengkap Pelanggan *</label>
+                        <input type="text" id="acc-name" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-chili-500 focus:border-chili-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Nomor WhatsApp *</label>
+                        <input type="tel" id="acc-phone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-chili-500 focus:border-chili-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Alamat Utama Pengantaran (Area Lumajang) *</label>
+                        <textarea id="acc-address" rows="2" required placeholder="Contoh: Jl. Raya Gambiran No. 12, Kec. Lumajang" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-chili-500 focus:border-chili-500 outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Zona Ongkir Default</label>
+                        <select id="acc-zone" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-chili-500 focus:border-chili-500 outline-none bg-white">
+                            <option value="0">Area Gambiran & Sekitarnya (Gratis Ongkir - Rp 0)</option>
+                            <option value="5000">Area Lumajang Kota / Rogotrunan (+ Rp 5.000)</option>
+                            <option value="8000">Area Labruk / Sukodono / Kunir (+ Rp 8.000)</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
+                        <button type="submit" class="flex-1 bg-chili-600 hover:bg-chili-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-md shadow-chili-600/20 transition-all">
+                            <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Akun ke Cookie
+                        </button>
+                        <button type="button" onclick="logoutAndClearAccount()" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-semibold py-3 px-4 rounded-xl text-xs transition-all">
+                            <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar & Hapus Cookie
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. MODAL RIWAYAT PESANAN & PELACAKAN PENGANTARAN REAL-TIME -->
+    <div id="tracking-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <!-- Header Modal -->
+            <div class="px-6 py-5 bg-gradient-to-r from-chili-600 to-chili-700 text-white flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-golden-400 text-lg">
+                        <i class="fa-solid fa-motorcycle"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-lg leading-tight">Riwayat & Lacak Pengantaran</h3>
+                        <p class="text-xs text-red-100">Data tersimpan aman di Cookie & Session Browser</p>
+                    </div>
+                </div>
+                <button onclick="closeTrackingModal()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Tab Filter: Pesanan Aktif vs Riwayat Selesai -->
+            <div class="px-6 pt-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between gap-2 shrink-0">
+                <div class="flex gap-2">
+                    <button onclick="switchOrderTab('active')" id="tab-order-active" class="px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-chili-600 text-chili-600 transition-all">
+                        Sedang Berjalan (<span id="count-active-orders">0</span>)
+                    </button>
+                    <button onclick="switchOrderTab('completed')" id="tab-order-completed" class="px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-800 transition-all">
+                        Riwayat Selesai (<span id="count-completed-orders">0</span>)
+                    </button>
+                </div>
+                <button onclick="clearAllOrderHistory()" class="text-[11px] text-gray-400 hover:text-red-600 font-semibold py-2" title="Bersihkan seluruh cookie riwayat">
+                    <i class="fa-regular fa-trash-can mr-1"></i>Hapus Riwayat
+                </button>
+            </div>
+
+            <!-- Konten Daftar Pesanan & Pelacakan -->
+            <div id="orders-list-container" class="p-6 overflow-y-auto space-y-5 flex-grow bg-cream/50">
+                <!-- Dirender secara dinamis via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL STRUK DIGITAL / KONFIRMASI PESANAN -->
+    <div id="receipt-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl">
+            <div class="bg-gradient-to-r from-chili-600 to-golden-500 p-6 text-white text-center relative">
+                <div class="w-14 h-14 bg-white text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg text-2xl">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h3 class="font-display font-extrabold text-xl">Pesanan Berhasil Dibuat!</h3>
+                <p class="text-xs text-white/90 mt-1" id="receipt-order-id">ID Pesanan: #AGG-0000</p>
+            </div>
+
+            <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto text-sm" id="receipt-content"></div>
+
+            <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row gap-2">
+                <button onclick="copyReceiptText()" class="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 font-semibold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5">
+                    <i class="fa-regular fa-copy"></i>
+                    <span>Salin Struk</span>
+                </button>
+                <button onclick="closeReceiptAndTrack()" class="flex-1 bg-chili-600 hover:bg-chili-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-motorcycle"></i>
+                    <span>Lacak Pesanan Sekarang</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // =========================================================================
+        // 1. HELPER COOKIE & SESSION STORAGE (PENYIMPANAN NYATA BROWSER)
+        // =========================================================================
+        const COOKIE_KEYS = {
+            USER_ACCOUNT: 'ag_gambiran_user',
+            ORDER_HISTORY: 'ag_gambiran_orders'
+        };
+
+        const SESSION_KEYS = {
+            ACTIVE_SESSION: 'ag_gambiran_session_meta',
+            CART_DRAFT: 'ag_gambiran_cart_draft',
+            TRACKED_ORDER_ID: 'ag_gambiran_active_track_id'
+        };
+
+        /**
+         * Menyimpan data JSON ke document.cookie dengan masa berlaku (default 30 hari)
+         */
+        function setCookie(name, valueObj, days = 30) {
+            try {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                const expires = "expires=" + date.toUTCString();
+                const encodedValue = encodeURIComponent(JSON.stringify(valueObj));
+                document.cookie = `${name}=${encodedValue};${expires};path=/;SameSite=Lax`;
+            } catch (e) {
+                console.error("Gagal menulis cookie:", e);
+            }
+        }
+
+        /**
+         * Membaca dan mem-parsing data JSON dari document.cookie
+         */
+        function getCookie(name) {
+            try {
+                const nameEQ = name + "=";
+                const ca = document.cookie.split(';');
+                for (let i = 0; i < ca.length; i++) {
+                    let c = ca[i].trim();
+                    if (c.indexOf(nameEQ) === 0) {
+                        const rawVal = c.substring(nameEQ.length, c.length);
+                        return JSON.parse(decodeURIComponent(rawVal));
+                    }
+                }
+            } catch (e) {
+                console.error("Gagal membaca cookie:", e);
+            }
+            return null;
+        }
+
+        /**
+         * Menghapus cookie berdasarkan nama
+         */
+        function deleteCookie(name) {
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax`;
+        }
+
+        /**
+         * Inisialisasi / pembaruan sessionStorage untuk sesi aktif browser
+         */
+        function initBrowserSession() {
+            let sessionMeta = null;
+            try {
+                const raw = sessionStorage.getItem(SESSION_KEYS.ACTIVE_SESSION);
+                if (raw) sessionMeta = JSON.parse(raw);
+            } catch (e) {}
+
+            if (!sessionMeta) {
+                sessionMeta = {
+                    sessionId: 'SES-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+                    startedAt: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB'
+                };
+                sessionStorage.setItem(SESSION_KEYS.ACTIVE_SESSION, JSON.stringify(sessionMeta));
+            }
+            return sessionMeta;
+        }
+
+        // =========================================================================
+        // 2. DATA KATALOG MENU AYAM GEPREK GAMBIRAN
+        // =========================================================================
+        const menuData = [
+            {
+                id: 1,
+                name: "Ayam Geprek Original",
+                category: "paket",
+                price: 13000,
+                hasSpiceLevel: true,
+                badge: "Terlaris",
+                description: "Ayam krispi renyah digeprek sambal bawang ulek dadakan + Nasi hangat & lalapan.",
+                image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 2,
+                name: "Ayam Geprek Mozzarella",
+                category: "paket",
+                price: 18000,
+                hasSpiceLevel: true,
+                badge: "Favorit",
+                description: "Ayam geprek pedas diselimuti lelehan keju mozzarella bakar yang gurih + Nasi.",
+                image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 3,
+                name: "Ayam Geprek Keju Lumer",
+                category: "paket",
+                price: 16000,
+                hasSpiceLevel: true,
+                badge: "Creamy",
+                description: "Ayam geprek pedas gurih disiram saus keju cheddar spesial yang melimpah + Nasi.",
+                image: "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 4,
+                name: "Ayam Geprek Sambal Matah",
+                category: "paket",
+                price: 15000,
+                hasSpiceLevel: true,
+                badge: "Segar",
+                description: "Perpaduan ayam krispi dengan irisan bawang merah, serai, daun jeruk & cabai segar.",
+                image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 5,
+                name: "Ayam Geprek Sambal Ijo",
+                category: "paket",
+                price: 15000,
+                hasSpiceLevel: true,
+                badge: "Khas",
+                description: "Ayam geprek renyah dengan sambal cabai hijau Padang yang wangi & pedas nagih.",
+                image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 6,
+                name: "Kulit Ayam Crispy Geprek",
+                category: "lauk",
+                price: 10000,
+                hasSpiceLevel: true,
+                badge: "Camilan",
+                description: "Kulit ayam goreng super garing digeprek dengan sambal bawang pedas gurih.",
+                image: "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 7,
+                name: "Tahu / Tempe Geprek",
+                category: "lauk",
+                price: 6000,
+                hasSpiceLevel: true,
+                badge: "Hemat",
+                description: "4 potong tahu & tempe goreng tepung krispi digeprek dengan sambal bawang pedas.",
+                image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 8,
+                name: "Es Teh Manis Jumbo",
+                category: "minuman",
+                price: 4000,
+                hasSpiceLevel: false,
+                badge: "Segar",
+                description: "Teh melati asli seduhan segar dengan gula murni dan es batu melimpah.",
+                image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 9,
+                name: "Es Jeruk Peras Segar",
+                category: "minuman",
+                price: 6000,
+                hasSpiceLevel: false,
+                badge: "Vitamin C",
+                description: "Perasan jeruk manis pilihan yang efektif meredakan pedas di lidah.",
+                image: "https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80"
+            }
+        ];
+
+        // =========================================================================
+        // 3. STATE GLOBAL APLIKASI
+        // =========================================================================
+        let currentUser = null; // Diambil dari Cookie
+        let orderHistory = [];  // Diambil dari Cookie
+        let cart = [];          // Diambil dari sessionStorage
+        let selectedLevels = {};
+        let orderMethod = 'delivery';
+        let currentOrderTab = 'active'; // 'active' | 'completed'
+        let lastReceiptText = '';
+        let autoProgressInterval = null;
+
+        menuData.forEach(item => {
+            if (item.hasSpiceLevel) selectedLevels[item.id] = 2;
+        });
+
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(angka);
+        }
+
+        // =========================================================================
+        // 4. MANAJEMEN AKUN PELANGGAN (COOKIE & SESSION)
+        // =========================================================================
+        function loadAccountFromCookie() {
+            const savedUser = getCookie(COOKIE_KEYS.USER_ACCOUNT);
+            const sessionMeta = initBrowserSession();
+
+            if (savedUser && savedUser.name) {
+                currentUser = savedUser;
+                // Sinkronkan juga ke sessionStorage agar sesi aktif mengenali pengguna
+                sessionStorage.setItem('ag_gambiran_logged_user', savedUser.name);
+
+                // Update tampilan navbar
+                const firstName = savedUser.name.split(' ')[0];
+                document.getElementById('nav-account-name').textContent = firstName;
+                document.getElementById('nav-account-avatar').textContent = firstName.charAt(0).toUpperCase();
+                document.getElementById('nav-account-avatar').className = "w-6 h-6 rounded-full bg-chili-600 text-white flex items-center justify-center text-xs font-bold";
+
+                // Isi otomatis form checkout
+                autofillCheckoutForm();
+            } else {
+                currentUser = null;
+                sessionStorage.removeItem('ag_gambiran_logged_user');
+                document.getElementById('nav-account-name').textContent = "Akun Saya";
+                document.getElementById('nav-account-avatar').innerHTML = `<i class="fa-regular fa-user"></i>`;
+                document.getElementById('nav-account-avatar').className = "w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold";
+            }
+
+            updateAccountTechnicalUI(sessionMeta);
+        }
+
+        function updateAccountTechnicalUI(sessionMeta) {
+            const cookieInfoEl = document.getElementById('tech-cookie-info');
+            const sessionInfoEl = document.getElementById('tech-session-info');
+            const statusPill = document.getElementById('session-status-pill');
+
+            if (currentUser) {
+                cookieInfoEl.textContent = `Aktif (${currentUser.name})`;
+                cookieInfoEl.className = "font-bold text-emerald-700 mt-0.5 truncate";
+                statusPill.textContent = "Terhubung (Cookie + Sesi)";
+                statusPill.className = "text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+            } else {
+                cookieInfoEl.textContent = "Kosong / Tamu";
+                cookieInfoEl.className = "font-bold text-gray-500 mt-0.5 truncate";
+                statusPill.textContent = "Sesi Tamu";
+                statusPill.className = "text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-gray-200 text-gray-700";
+            }
+
+            if (sessionMeta) {
+                sessionInfoEl.textContent = `${sessionMeta.sessionId} (${sessionMeta.startedAt})`;
+            }
+        }
+
+        function autofillCheckoutForm() {
+            const badge = document.getElementById('autofill-badge');
+            if (currentUser) {
+                document.getElementById('cust-name').value = currentUser.name || '';
+                document.getElementById('cust-phone').value = currentUser.phone || '';
+                document.getElementById('cust-address').value = currentUser.address || '';
+                if (currentUser.zone !== undefined) {
+                    document.getElementById('delivery-zone').value = currentUser.zone;
+                }
+                if (badge) badge.classList.remove('hidden');
+            } else {
+                if (badge) badge.classList.add('hidden');
+            }
+        }
+
+        function openAccountModal() {
+            const sessionMeta = initBrowserSession();
+            updateAccountTechnicalUI(sessionMeta);
+
+            if (currentUser) {
+                document.getElementById('acc-name').value = currentUser.name || '';
+                document.getElementById('acc-phone').value = currentUser.phone || '';
+                document.getElementById('acc-address').value = currentUser.address || '';
+                document.getElementById('acc-zone').value = currentUser.zone || '0';
+            } else {
+                document.getElementById('acc-name').value = '';
+                document.getElementById('acc-phone').value = '';
+                document.getElementById('acc-address').value = '';
+                document.getElementById('acc-zone').value = '0';
+            }
+
+            const modal = document.getElementById('account-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAccountModal() {
+            const modal = document.getElementById('account-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function saveCustomerAccount(event) {
+            event.preventDefault();
+            const userData = {
+                name: document.getElementById('acc-name').value.trim(),
+                phone: document.getElementById('acc-phone').value.trim(),
+                address: document.getElementById('acc-address').value.trim(),
+                zone: document.getElementById('acc-zone').value,
+                updatedAt: new Date().toISOString()
+            };
+
+            setCookie(COOKIE_KEYS.USER_ACCOUNT, userData, 30);
+            loadAccountFromCookie();
+            updateCartSummary();
+            closeAccountModal();
+            showToast(`Profil ${userData.name} berhasil disimpan ke Cookie!`);
+        }
+
+        function logoutAndClearAccount() {
+            deleteCookie(COOKIE_KEYS.USER_ACCOUNT);
+            sessionStorage.removeItem('ag_gambiran_logged_user');
+            loadAccountFromCookie();
+            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-phone').value = '';
+            document.getElementById('cust-address').value = '';
+            closeAccountModal();
+            showToast('Sesi ditutup & Cookie akun dihapus.');
+        }
+
+        // =========================================================================
+        // 5. KATALOG MENU & LEVEL PEDAS
+        // =========================================================================
+        function renderMenu(filterCat = 'semua') {
+            const grid = document.getElementById('menu-grid');
+            grid.innerHTML = '';
+
+            const filteredItems = filterCat === 'semua' 
+                ? menuData 
+                : menuData.filter(item => item.category === filterCat);
+
+            filteredItems.forEach(item => {
+                const currentLvl = selectedLevels[item.id] ?? 0;
+                let spiceSelectorHTML = '';
+
+                if (item.hasSpiceLevel) {
+                    const levels = [0, 1, 2, 3, 4, 5];
+                    const buttons = levels.map(lvl => {
+                        const isSelected = currentLvl === lvl;
+                        const activeClass = isSelected 
+                            ? 'bg-chili-600 text-white border-chili-600 font-bold shadow-xs' 
+                            : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-chili-300';
+                        return `
+                            <button type="button" 
+                                onclick="selectSpiceLevel(${item.id}, ${lvl})"
+                                class="w-8 h-8 rounded-lg border text-xs transition-all ${activeClass}">
+                                ${lvl}
+                            </button>
+                        `;
+                    }).join('');
+
+                    const spiceDesc = [
+                        'Tidak Pedas', 'Pedas Santai', 'Pedas Sedang', 
+                        'Pedas Nampol', 'Super Pedas', 'Pedas Gila 🔥'
+                    ][currentLvl];
+
+                    spiceSelectorHTML = `
+                        <div class="pt-3 mt-3 border-t border-gray-100">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <span class="text-[11px] font-bold text-gray-500 uppercase">Level Pedas:</span>
+                                <span class="text-[11px] font-bold text-chili-600" id="spice-label-${item.id}">${spiceDesc}</span>
+                            </div>
+                            <div class="flex justify-between gap-1" id="spice-btns-${item.id}">
+                                ${buttons}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-3xl border border-orange-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="relative h-48 overflow-hidden bg-orange-50">
+                            <img src="${item.image}" 
+                                 alt="${item.name}" 
+                                 onerror="this.onerror=null; this.src='https://placehold.co/600x400/f59e0b/ffffff?text=${encodeURIComponent(item.name)}';"
+                                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                            <span class="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-chili-700 font-extrabold text-[11px] px-3 py-1 rounded-full shadow-xs">
+                                ${item.badge}
+                            </span>
+                        </div>
+
+                        <div class="p-5">
+                            <h3 class="font-display font-bold text-lg text-gray-900 leading-snug">${item.name}</h3>
+                            <p class="font-display font-extrabold text-chili-600 text-base mt-1">${formatRupiah(item.price)}</p>
+                            <p class="text-xs text-gray-500 mt-2 leading-relaxed line-clamp-2">${item.description}</p>
+                            ${spiceSelectorHTML}
+                        </div>
+                    </div>
+
+                    <div class="px-5 pb-5 pt-1">
+                        <button onclick="addToCart(${item.id})" 
+                            class="w-full bg-gradient-to-r from-chili-600 to-chili-700 hover:from-chili-700 hover:to-chili-800 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-sm flex items-center justify-center gap-2 transition-all active:scale-95">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Tambah ke Keranjang</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterMenu(category) {
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.dataset.cat === category) {
+                    btn.className = "cat-btn active px-5 py-2.5 rounded-xl font-semibold text-sm transition-all bg-chili-600 text-white shadow-md shadow-chili-600/20";
+                } else {
+                    btn.className = "cat-btn px-5 py-2.5 rounded-xl font-semibold text-sm transition-all bg-white text-gray-700 hover:bg-orange-50 border border-orange-200";
+                }
+            });
+            renderMenu(category);
+        }
+
+        function selectSpiceLevel(itemId, level) {
+            selectedLevels[itemId] = level;
+            const btnContainer = document.getElementById(`spice-btns-${itemId}`);
+            const labelEl = document.getElementById(`spice-label-${itemId}`);
+            const spiceDesc = [
+                'Tidak Pedas', 'Pedas Santai', 'Pedas Sedang', 
+                'Pedas Nampol', 'Super Pedas', 'Pedas Gila 🔥'
+            ][level];
+
+            if (labelEl) labelEl.textContent = spiceDesc;
+            if (btnContainer) {
+                Array.from(btnContainer.children).forEach((btn, idx) => {
+                    if (idx === level) {
+                        btn.className = "w-8 h-8 rounded-lg border text-xs transition-all bg-chili-600 text-white border-chili-600 font-bold shadow-xs";
+                    } else {
+                        btn.className = "w-8 h-8 rounded-lg border text-xs transition-all bg-gray-50 text-gray-600 border-gray-200 hover:border-chili-300";
+                    }
+                });
+            }
+        }
+
+        // =========================================================================
+        // 6. KERANJANG BELANJA (DISIMPAN DI SESSION STORAGE)
+        // =========================================================================
+        function saveCartToSession() {
+            try {
+                sessionStorage.setItem(SESSION_KEYS.CART_DRAFT, JSON.stringify(cart));
+            } catch (e) {}
+        }
+
+        function loadCartFromSession() {
+            try {
+                const savedCart = sessionStorage.getItem(SESSION_KEYS.CART_DRAFT);
+                if (savedCart) {
+                    cart = JSON.parse(savedCart);
+                }
+            } catch (e) {
+                cart = [];
+            }
+        }
+
+        function addToCart(itemId) {
+            const item = menuData.find(m => m.id === itemId);
+            if (!item) return;
+
+            const spiceLevel = item.hasSpiceLevel ? (selectedLevels[item.id] ?? 2) : null;
+            const cartKey = item.hasSpiceLevel ? `${item.id}-lvl${spiceLevel}` : `${item.id}`;
+
+            const existingItem = cart.find(c => c.key === cartKey);
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push({
+                    key: cartKey,
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    spiceLevel: spiceLevel,
+                    qty: 1
+                });
+            }
+
+            saveCartToSession();
+            updateCartUI();
+            const levelText = spiceLevel !== null ? ` (Level ${spiceLevel})` : '';
+            showToast(`${item.name}${levelText} ditambahkan!`);
+        }
+
+        function updateItemQty(cartKey, delta) {
+            const idx = cart.findIndex(c => c.key === cartKey);
+            if (idx === -1) return;
+
+            cart[idx].qty += delta;
+            if (cart[idx].qty <= 0) {
+                cart.splice(idx, 1);
+            }
+            saveCartToSession();
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cart-badge').textContent = totalItems;
+            document.getElementById('drawer-item-count').textContent = `${totalItems} item dipilih • Tersimpan di Sesi`;
+
+            const container = document.getElementById('cart-items-container');
+            const formSection = document.getElementById('checkout-form-section');
+            const footerSection = document.getElementById('cart-footer');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 px-4">
+                        <div class="w-16 h-16 bg-orange-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                        </div>
+                        <p class="font-display font-bold text-gray-800">Keranjang Masih Kosong</p>
+                        <p class="text-xs text-gray-500 mt-1">Yuk pilih menu ayam geprek favoritmu sekarang!</p>
+                        <button onclick="toggleCartDrawer()" class="mt-4 px-5 py-2.5 bg-chili-600 text-white text-xs font-bold rounded-xl">
+                            Lihat Daftar Menu
+                        </button>
+                    </div>
+                `;
+                formSection.classList.add('hidden');
+                footerSection.classList.add('hidden');
+                return;
+            }
+
+            container.innerHTML = cart.map(item => {
+                const levelBadge = item.spiceLevel !== null 
+                    ? `<span class="inline-block bg-red-100 text-chili-700 text-[10px] font-bold px-2 py-0.5 rounded-md mt-1">🌶️ Level ${item.spiceLevel}</span>` 
+                    : '';
+
+                return `
+                    <div class="flex items-center justify-between gap-3 p-3.5 bg-cream rounded-2xl border border-orange-100">
+                        <div class="flex-grow">
+                            <h5 class="font-bold text-sm text-gray-900 leading-tight">${item.name}</h5>
+                            ${levelBadge}
+                            <p class="text-xs font-bold text-chili-600 mt-1">${formatRupiah(item.price * item.qty)}</p>
+                        </div>
+                        <div class="flex items-center gap-2 bg-white px-2 py-1 rounded-xl border border-gray-200 shadow-2xs">
+                            <button onclick="updateItemQty('${item.key}', -1)" class="w-7 h-7 rounded-lg text-gray-600 hover:bg-red-50 hover:text-chili-600 font-bold flex items-center justify-center">-</button>
+                            <span class="text-xs font-extrabold w-5 text-center">${item.qty}</span>
+                            <button onclick="updateItemQty('${item.key}', 1)" class="w-7 h-7 rounded-lg text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 font-bold flex items-center justify-center">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            formSection.classList.remove('hidden');
+            footerSection.classList.remove('hidden');
+            autofillCheckoutForm();
+            updateCartSummary();
+        }
+
+        function setOrderMethod(method) {
+            orderMethod = method;
+            const btnDelivery = document.getElementById('btn-delivery');
+            const btnTakeaway = document.getElementById('btn-takeaway');
+            const deliveryGroup = document.getElementById('delivery-area-group');
+            const shippingRow = document.getElementById('summary-shipping-row');
+
+            if (method === 'delivery') {
+                btnDelivery.className = "method-btn active py-3 px-3 rounded-xl border-2 border-chili-600 bg-chili-50 text-chili-700 font-bold text-xs flex flex-col items-center gap-1 transition-all";
+                btnTakeaway.className = "method-btn py-3 px-3 rounded-xl border-2 border-gray-200 bg-white text-gray-600 font-bold text-xs flex flex-col items-center gap-1 transition-all";
+                deliveryGroup.classList.remove('hidden');
+                shippingRow.classList.remove('hidden');
+            } else {
+                btnTakeaway.className = "method-btn active py-3 px-3 rounded-xl border-2 border-chili-600 bg-chili-50 text-chili-700 font-bold text-xs flex flex-col items-center gap-1 transition-all";
+                btnDelivery.className = "method-btn py-3 px-3 rounded-xl border-2 border-gray-200 bg-white text-gray-600 font-bold text-xs flex flex-col items-center gap-1 transition-all";
+                deliveryGroup.classList.add('hidden');
+                shippingRow.classList.add('hidden');
+            }
+            updateCartSummary();
+        }
+
+        function updateCartSummary() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            let shippingCost = 0;
+
+            if (orderMethod === 'delivery') {
+                shippingCost = parseInt(document.getElementById('delivery-zone').value, 10) || 0;
+            }
+
+            const total = subtotal + shippingCost;
+
+            document.getElementById('summary-subtotal').textContent = formatRupiah(subtotal);
+            document.getElementById('summary-shipping').textContent = shippingCost === 0 ? 'Gratis (Rp 0)' : formatRupiah(shippingCost);
+            document.getElementById('summary-shipping').className = shippingCost === 0 ? 'font-semibold text-emerald-600' : 'font-semibold text-gray-900';
+            document.getElementById('summary-total').textContent = formatRupiah(total);
+        }
+
+        // =========================================================================
+        // 7. PROSES PESANAN & PENYIMPANAN RIWAYAT KE COOKIE + SESSION TRACKING
+        // =========================================================================
+        const COURIER_PROFILES = [
+            { name: "Mas Riko", plate: "N 4821 YK", phone: "0812-3344-5566" },
+            { name: "Mas Dimas", plate: "N 5190 YD", phone: "0857-9988-7766" },
+            { name: "Mas Arif", plate: "N 3042 YM", phone: "0813-4455-6677" }
+        ];
+
+        function loadOrdersFromCookie() {
+            const savedOrders = getCookie(COOKIE_KEYS.ORDER_HISTORY);
+            if (Array.isArray(savedOrders)) {
+                orderHistory = savedOrders;
+            } else {
+                orderHistory = [];
+            }
+            updateOrderBadgesAndBanner();
+        }
+
+        function saveOrdersToCookie() {
+            // Batasi maksimal 10 riwayat terakhir agar ukuran cookie browser tetap optimal (< 4KB)
+            if (orderHistory.length > 10) {
+                orderHistory = orderHistory.slice(0, 10);
+            }
+            setCookie(COOKIE_KEYS.ORDER_HISTORY, orderHistory, 30);
+            updateOrderBadgesAndBanner();
+        }
+
+        function processOrder(type) {
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+            const notes = document.getElementById('cust-notes').value.trim();
+            const zoneVal = document.getElementById('delivery-zone').value;
+            const saveToCookie = document.getElementById('save-to-cookie-cb').checked;
+
+            if (!name) {
+                showToast('Mohon isi Nama Lengkap Anda!', 'error');
+                document.getElementById('cust-name').focus();
+                return;
+            }
+            if (!phone) {
+                showToast('Mohon isi Nomor WhatsApp aktif!', 'error');
+                document.getElementById('cust-phone').focus();
+                return;
+            }
+            if (orderMethod === 'delivery' && !address) {
+                showToast('Mohon isi Alamat Lengkap pengiriman!', 'error');
+                document.getElementById('cust-address').focus();
+                return;
+            }
+
+            // Simpan/update profil akun ke Cookie jika dicentang
+            if (saveToCookie) {
+                setCookie(COOKIE_KEYS.USER_ACCOUNT, {
+                    name,
+                    phone,
+                    address: address || (currentUser ? currentUser.address : ''),
+                    zone: zoneVal,
+                    updatedAt: new Date().toISOString()
+                }, 30);
+                loadAccountFromCookie();
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const shippingCost = orderMethod === 'delivery' ? (parseInt(zoneVal, 10) || 0) : 0;
+            const total = subtotal + shippingCost;
+            const orderId = 'AGG-' + Math.floor(1000 + Math.random() * 9000);
+            const methodLabel = orderMethod === 'delivery' ? 'Pesan Antar (Delivery)' : 'Ambil di Tempat (Takeaway)';
+            const nowStr = new Date().toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            const randomCourier = COURIER_PROFILES[Math.floor(Math.random() * COURIER_PROFILES.length)];
+
+            // Buat objek pesanan baru untuk disimpan di Cookie Riwayat
+            const newOrder = {
+                orderId: orderId,
+                createdAt: nowStr,
+                customerName: name,
+                customerPhone: phone,
+                method: orderMethod,
+                methodLabel: methodLabel,
+                address: orderMethod === 'delivery' ? address : 'Ambil di Kedai Jl. Raya Gambiran',
+                notes: notes,
+                items: cart.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    spiceLevel: item.spiceLevel,
+                    qty: item.qty
+                })),
+                subtotal: subtotal,
+                shippingCost: shippingCost,
+                total: total,
+                // Tahap tracking: 1 = Diterima Kedai, 2 = Sedang Digeprek, 3 = Kurir Menuju Lokasi, 4 = Tiba/Selesai
+                trackingStep: 1,
+                isCompleted: false,
+                courier: randomCourier
+            };
+
+            // Simpan ke Cookie & set sebagai pesanan aktif di sessionStorage
+            orderHistory.unshift(newOrder);
+            saveOrdersToCookie();
+            sessionStorage.setItem(SESSION_KEYS.TRACKED_ORDER_ID, orderId);
+
+            // Susun teks struk WhatsApp
+            let itemsText = cart.map((item, i) => {
+                const lvl = item.spiceLevel !== null ? ` [Level ${item.spiceLevel}]` : '';
+                return `${i + 1}. ${item.name}${lvl} x${item.qty} = ${formatRupiah(item.price * item.qty)}`;
+            }).join('\n');
+
+            lastReceiptText = `*PESANAN BARU - AYAM GEPREK GAMBIRAN (LUMAJANG)*\n` +
+                `ID Pesanan: #${orderId}\n` +
+                `--------------------------------\n` +
+                `*Data Pemesan:*\n` +
+                `Nama: ${name}\n` +
+                `No. WA: ${phone}\n` +
+                `Metode: ${methodLabel}\n` +
+                (orderMethod === 'delivery' ? `Alamat: ${address}\n` : '') +
+                (notes ? `Catatan: ${notes}\n` : '') +
+                `--------------------------------\n` +
+                `*Detail Menu:*\n${itemsText}\n` +
+                `--------------------------------\n` +
+                `Subtotal: ${formatRupiah(subtotal)}\n` +
+                (orderMethod === 'delivery' ? `Ongkir: ${formatRupiah(shippingCost)}\n` : '') +
+                `*TOTAL BAYAR: ${formatRupiah(total)}*`;
+
+            if (type === 'whatsapp') {
+                const waNumber = '6281234567890';
+                const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(lastReceiptText)}`;
+                window.open(waUrl, '_blank');
+            }
+
+            showReceiptModal(newOrder);
+
+            // Kosongkan keranjang & session draft setelah berhasil checkout
+            cart = [];
+            saveCartToSession();
+            updateCartUI();
+        }
+
+        function showReceiptModal(order) {
+            toggleCartDrawer(false);
+            document.getElementById('receipt-order-id').textContent = `ID Pesanan: #${order.orderId}`;
+
+            const itemsHTML = order.items.map(item => {
+                const lvl = item.spiceLevel !== null ? `<span class="text-chili-600 font-semibold">(Lvl ${item.spiceLevel})</span>` : '';
+                return `
+                    <div class="flex justify-between items-start py-1.5 border-b border-dashed border-gray-200">
+                        <div>
+                            <span class="font-semibold text-gray-800">${item.qty}x ${item.name}</span> ${lvl}
+                        </div>
+                        <span class="font-bold text-gray-900">${formatRupiah(item.price * item.qty)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('receipt-content').innerHTML = `
+                <div class="bg-orange-50/70 p-3.5 rounded-2xl space-y-1 text-xs">
+                    <p><span class="text-gray-500">Pemesan:</span> <strong class="text-gray-900">${order.customerName}</strong> (${order.customerPhone})</p>
+                    <p><span class="text-gray-500">Metode:</span> <strong class="text-chili-700">${order.methodLabel}</strong></p>
+                    <p><span class="text-gray-500">Tujuan:</span> <span class="text-gray-800">${order.address}</span></p>
+                    ${order.notes ? `<p><span class="text-gray-500">Catatan:</span> <em class="text-gray-700">"${order.notes}"</em></p>` : ''}
+                </div>
+
+                <div class="space-y-1">
+                    <p class="text-xs font-bold text-gray-400 uppercase">Rincian Menu</p>
+                    ${itemsHTML}
+                </div>
+
+                <div class="pt-2 space-y-1 text-xs">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Subtotal</span>
+                        <span>${formatRupiah(order.subtotal)}</span>
+                    </div>
+                    ${order.method === 'delivery' ? `
+                    <div class="flex justify-between text-gray-600">
+                        <span>Ongkos Kirim</span>
+                        <span>${order.shippingCost === 0 ? 'Gratis' : formatRupiah(order.shippingCost)}</span>
+                    </div>` : ''}
+                    <div class="flex justify-between text-base font-extrabold text-gray-900 pt-2 border-t border-gray-200">
+                        <span>Total Pembayaran</span>
+                        <span class="text-chili-600">${formatRupiah(order.total)}</span>
+                    </div>
+                </div>
+            `;
+
+            const modal = document.getElementById('receipt-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeReceiptAndTrack() {
+            const modal = document.getElementById('receipt-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            openTrackingModal('active');
+        }
+
+        function copyReceiptText() {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = lastReceiptText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast('Rincian struk berhasil disalin!');
+        }
+
+        // =========================================================================
+        // 8. PELACAKAN PENGANTARAN & RIWAYAT PESANAN (BELUM SELESAI vs SELESAI)
+        // =========================================================================
+        function getTrackingStepDetails(order) {
+            const isDelivery = order.method === 'delivery';
+            const steps = [
+                {
+                    step: 1,
+                    title: "Pesanan Diterima Kedai",
+                    desc: "Kasir kedai Jl. Raya Gambiran telah menerima & memverifikasi pesananmu.",
+                    location: "Kedai Ayam Geprek Gambiran, Lumajang",
+                    eta: isDelivery ? "Estimasi 20-25 menit" : "Estimasi 10-15 menit",
+                    icon: "fa-clipboard-check"
+                },
+                {
+                    step: 2,
+                    title: "Sedang Digeprek & Dikemas",
+                    desc: "Ayam krispi hangat digeprek bersama sambal ulek dadakan sesuai level pedas.",
+                    location: "Dapur Utama Gambiran",
+                    eta: isDelivery ? "Estimasi 12-15 menit" : "Estimasi 5 menit lagi siap",
+                    icon: "fa-fire-burner"
+                },
+                {
+                    step: 3,
+                    title: isDelivery ? "Kurir Menuju Lokasi Tujuan" : "Pesanan Siap Diambil di Kedai",
+                    desc: isDelivery 
+                        ? `${order.courier.name} (${order.courier.plate}) melintas via Simpang Gambiran menuju alamatmu.`
+                        : "Pesanan hangatmu sudah siap di meja pengambilan kedai.",
+                    location: isDelivery ? "Rute: Jl. Raya Gambiran → Menuju Alamat Tujuan" : "Meja Kasir Kedai Gambiran",
+                    eta: isDelivery ? "Estimasi 5-8 menit tiba" : "Siap diambil sekarang",
+                    icon: isDelivery ? "fa-motorcycle" : "fa-bag-shopping"
+                },
+                {
+                    step: 4,
+                    title: "Pesanan Tiba & Selesai",
+                    desc: isDelivery 
+                        ? "Pesanan telah diserahkan kepada pemesan. Selamat menikmati!" 
+                        : "Pesanan telah diambil pelanggan. Terima kasih!",
+                    location: order.address,
+                    eta: "Selesai",
+                    icon: "fa-circle-check"
+                }
+            ];
+            return steps;
+        }
+
+        function updateOrderBadgesAndBanner() {
+            const activeOrders = orderHistory.filter(o => !o.isCompleted);
+            const completedOrders = orderHistory.filter(o => o.isCompleted);
+
+            // Update badge di navbar
+            const badge = document.getElementById('active-order-badge');
+            const mobileBadge = document.getElementById('mobile-active-badge');
+            if (activeOrders.length > 0) {
+                badge.textContent = activeOrders.length;
+                badge.classList.remove('hidden');
+                mobileBadge.textContent = activeOrders.length;
+                mobileBadge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+                mobileBadge.classList.add('hidden');
+            }
+
+            // Update counter tab modal
+            document.getElementById('count-active-orders').textContent = activeOrders.length;
+            document.getElementById('count-completed-orders').textContent = completedOrders.length;
+
+            // Update Banner Pelacakan Aktif di bawah header
+            const banner = document.getElementById('live-tracking-banner');
+            if (activeOrders.length > 0) {
+                const trackedId = sessionStorage.getItem(SESSION_KEYS.TRACKED_ORDER_ID);
+                const latestActive = activeOrders.find(o => o.orderId === trackedId) || activeOrders[0];
+                const steps = getTrackingStepDetails(latestActive);
+                const currentStepObj = steps.find(s => s.step === latestActive.trackingStep) || steps[0];
+
+                document.getElementById('banner-order-id').textContent = `#${latestActive.orderId}`;
+                document.getElementById('banner-status-text').textContent = `${currentStepObj.title} (${currentStepObj.location})`;
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        function openTrackingModal(defaultTab) {
+            if (defaultTab) {
+                currentOrderTab = defaultTab;
+            } else {
+                const hasActive = orderHistory.some(o => !o.isCompleted);
+                currentOrderTab = hasActive ? 'active' : 'completed';
+            }
+            switchOrderTab(currentOrderTab);
+
+            const modal = document.getElementById('tracking-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeTrackingModal() {
+            const modal = document.getElementById('tracking-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function switchOrderTab(tab) {
+            currentOrderTab = tab;
+            const tabActive = document.getElementById('tab-order-active');
+            const tabCompleted = document.getElementById('tab-order-completed');
+
+            if (tab === 'active') {
+                tabActive.className = "px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-chili-600 text-chili-600 transition-all";
+                tabCompleted.className = "px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-800 transition-all";
+            } else {
+                tabCompleted.className = "px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-chili-600 text-chili-600 transition-all";
+                tabActive.className = "px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-800 transition-all";
+            }
+            renderOrdersList();
+        }
+
+        function renderOrdersList() {
+            const container = document.getElementById('orders-list-container');
+            const filtered = orderHistory.filter(o => currentOrderTab === 'active' ? !o.isCompleted : o.isCompleted);
+
+            if (filtered.length === 0) {
+                const emptyTitle = currentOrderTab === 'active' ? "Tidak Ada Pesanan Berjalan" : "Belum Ada Riwayat Selesai";
+                const emptyDesc = currentOrderTab === 'active' 
+                    ? "Semua pesananmu sudah selesai atau kamu belum membuat pesanan baru." 
+                    : "Pesanan yang sudah selesai diantar akan tersimpan otomatis di Cookie browsermu.";
+
+                container.innerHTML = `
+                    <div class="text-center py-12 px-4 bg-white rounded-3xl border border-orange-100">
+                        <div class="w-16 h-16 bg-orange-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                            <i class="fa-solid ${currentOrderTab === 'active' ? 'fa-motorcycle' : 'fa-clock-rotate-left'}"></i>
+                        </div>
+                        <p class="font-display font-bold text-gray-900">${emptyTitle}</p>
+                        <p class="text-xs text-gray-500 mt-1 max-w-xs mx-auto">${emptyDesc}</p>
+                        <button onclick="closeTrackingModal()" class="mt-4 px-5 py-2.5 bg-chili-600 text-white text-xs font-bold rounded-xl">
+                            Pesan Ayam Geprek
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(order => {
+                const steps = getTrackingStepDetails(order);
+                const activeStepObj = steps.find(s => s.step === order.trackingStep) || steps[0];
+
+                // Build Stepper Timeline untuk Pelacakan Pengantaran
+                const timelineHTML = steps.map(s => {
+                    const isDone = order.trackingStep > s.step || order.isCompleted;
+                    const isCurrent = order.trackingStep === s.step && !order.isCompleted;
+
+                    let dotClass = "bg-gray-200 text-gray-400";
+                    let titleClass = "text-gray-400";
+                    if (isDone) {
+                        dotClass = "bg-emerald-500 text-white";
+                        titleClass = "text-gray-800";
+                    } else if (isCurrent) {
+                        dotClass = "bg-chili-600 text-white ring-4 ring-chili-100";
+                        titleClass = "text-chili-700 font-extrabold";
+                    }
+
+                    return `
+                        <div class="flex items-start gap-3 relative pb-4 last:pb-0">
+                            <div class="w-7 h-7 rounded-full ${dotClass} flex items-center justify-center text-xs shrink-0 z-10 mt-0.5 transition-all">
+                                <i class="fa-solid ${isDone ? 'fa-check' : s.icon}"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-xs font-bold ${titleClass}">${s.title}</p>
+                                    ${isCurrent ? `<span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">${s.eta}</span>` : ''}
+                                </div>
+                                ${isCurrent ? `<p class="text-[11px] text-gray-600 mt-0.5 leading-relaxed">${s.desc}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Ringkasan menu
+                const itemsSummary = order.items.map(i => `${i.qty}x ${i.name}${i.spiceLevel !== null ? ` (Lvl ${i.spiceLevel})` : ''}`).join(', ');
+
+                // Tombol aksi pesanan
+                let actionButtonsHTML = '';
+                if (!order.isCompleted) {
+                    actionButtonsHTML = `
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 border-t border-gray-100">
+                            <button onclick="advanceOrderStep('${order.orderId}')" class="bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-forward-step text-amber-600"></i>
+                                <span>Simulasi Tahap Berikutnya</span>
+                            </button>
+                            <button onclick="markOrderAsCompleted('${order.orderId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>Tandai Pesanan Selesai</span>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    actionButtonsHTML = `
+                        <div class="pt-3 border-t border-gray-100 flex justify-between items-center">
+                            <span class="text-[11px] text-emerald-700 font-semibold"><i class="fa-solid fa-check-double mr-1"></i>Pesanan telah diterima & selesai</span>
+                            <button onclick="reorderItems('${order.orderId}')" class="bg-chili-600 hover:bg-chili-700 text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-rotate-right"></i>
+                                <span>Pesan Lagi</span>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="bg-white rounded-3xl p-5 border ${order.isCompleted ? 'border-gray-200' : 'border-orange-200 shadow-md'} space-y-4">
+                        <!-- Header Kartu Pesanan -->
+                        <div class="flex flex-wrap justify-between items-start gap-2 pb-3 border-b border-gray-100">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-display font-extrabold text-sm text-gray-900">#${order.orderId}</span>
+                                    <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${order.isCompleted ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-chili-700'}">
+                                        ${order.isCompleted ? 'SELESAI' : 'BELUM SELESAI'}
+                                    </span>
+                                </div>
+                                <p class="text-[11px] text-gray-400 mt-0.5">${order.createdAt} • ${order.methodLabel}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-display font-extrabold text-sm text-chili-600">${formatRupiah(order.total)}</p>
+                                <p class="text-[11px] text-gray-500">${order.items.reduce((s, i) => s + i.qty, 0)} item</p>
+                            </div>
+                        </div>
+
+                        <!-- Info Posisi Pengantaran / Kurir (Jika Belum Selesai) -->
+                        ${!order.isCompleted ? `
+                        <div class="bg-gradient-to-r from-orange-50 to-amber-50/70 p-3.5 rounded-2xl border border-orange-100 space-y-2">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="font-bold text-gray-800"><i class="fa-solid fa-location-dot text-chili-600 mr-1"></i> Posisi Saat Ini:</span>
+                                <span class="font-semibold text-chili-700">${activeStepObj.location}</span>
+                            </div>
+                            ${order.method === 'delivery' && order.trackingStep >= 3 ? `
+                            <div class="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-orange-100 text-xs">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-full bg-gray-900 text-golden-400 flex items-center justify-center text-xs">
+                                        <i class="fa-solid fa-helmet-safety"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900">${order.courier.name}</p>
+                                        <p class="text-[10px] text-gray-500">Plat: ${order.courier.plate}</p>
+                                    </div>
+                                </div>
+                                <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">Kurir Gambiran</span>
+                            </div>` : ''}
+                        </div>
+                        ` : ''}
+
+                        <!-- Timeline Stepper -->
+                        <div class="pl-1">
+                            ${timelineHTML}
+                        </div>
+
+                        <!-- Ringkasan Menu & Alamat -->
+                        <div class="bg-gray-50 p-3 rounded-2xl text-xs space-y-1 text-gray-600">
+                            <p><strong class="text-gray-800">Menu:</strong> ${itemsSummary}</p>
+                            <p><strong class="text-gray-800">Tujuan:</strong> ${order.address}</p>
+                        </div>
+
+                        <!-- Tombol Aksi -->
+                        ${actionButtonsHTML}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function advanceOrderStep(orderId) {
+            const order = orderHistory.find(o => o.orderId === orderId);
+            if (!order || order.isCompleted) return;
+
+            if (order.trackingStep < 4) {
+                order.trackingStep += 1;
+                if (order.trackingStep === 4) {
+                    order.isCompleted = true;
+                    showToast(`Pesanan #${orderId} telah tiba & selesai!`);
+                } else {
+                    const steps = getTrackingStepDetails(order);
+                    const st = steps.find(s => s.step === order.trackingStep);
+                    showToast(`Status #${orderId}: ${st.title}`);
+                }
+                saveOrdersToCookie();
+                renderOrdersList();
+            }
+        }
+
+        function markOrderAsCompleted(orderId) {
+            const order = orderHistory.find(o => o.orderId === orderId);
+            if (!order) return;
+
+            order.trackingStep = 4;
+            order.isCompleted = true;
+            saveOrdersToCookie();
+            renderOrdersList();
+            showToast(`Terima kasih! Pesanan #${orderId} ditandai selesai.`);
+        }
+
+        function reorderItems(orderId) {
+            const order = orderHistory.find(o => o.orderId === orderId);
+            if (!order) return;
+
+            order.items.forEach(item => {
+                const cartKey = item.spiceLevel !== null ? `${item.id}-lvl${item.spiceLevel}` : `${item.id}`;
+                const existing = cart.find(c => c.key === cartKey);
+                if (existing) {
+                    existing.qty += item.qty;
+                } else {
+                    cart.push({ ...item, key: cartKey });
+                }
+            });
+
+            saveCartToSession();
+            updateCartUI();
+            closeTrackingModal();
+            toggleCartDrawer(true);
+            showToast(`Menu dari #${orderId} ditambahkan kembali ke keranjang!`);
+        }
+
+        function clearAllOrderHistory() {
+            orderHistory = [];
+            deleteCookie(COOKIE_KEYS.ORDER_HISTORY);
+            sessionStorage.removeItem(SESSION_KEYS.TRACKED_ORDER_ID);
+            updateOrderBadgesAndBanner();
+            renderOrdersList();
+            showToast('Seluruh riwayat pesanan di Cookie telah dihapus.');
+        }
+
+        // Simulasi otomatis pergerakan kurir secara berkala setiap 25 detik untuk pesanan yang sedang berjalan
+        function startAutoDeliverySimulation() {
+            if (autoProgressInterval) clearInterval(autoProgressInterval);
+            autoProgressInterval = setInterval(() => {
+                const activeOrder = orderHistory.find(o => !o.isCompleted && o.trackingStep < 3);
+                if (activeOrder) {
+                    activeOrder.trackingStep += 1;
+                    saveOrdersToCookie();
+                    if (!document.getElementById('tracking-modal').classList.contains('hidden')) {
+                        renderOrdersList();
+                    }
+                }
+            }, 25000);
+        }
+
+        // =========================================================================
+        // 9. KONTROL UI & JAM OPERASIONAL REAL-TIME WIB
+        // =========================================================================
+        function toggleCartDrawer(forceState) {
+            const drawer = document.getElementById('cart-drawer');
+            const overlay = document.getElementById('cart-overlay');
+            const isOpen = !drawer.classList.contains('translate-x-full');
+            const shouldOpen = forceState !== undefined ? forceState : !isOpen;
+
+            if (shouldOpen) {
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'error' ? 'bg-red-600' : 'bg-gray-900';
+            const icon = type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check text-golden-400';
+
+            toast.className = `${bgColor} text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs sm:text-sm font-semibold transform transition-all duration-300 translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
+
+            container.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function updateStoreStatus() {
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const wibTime = new Date(utc + (3600000 * 7));
+
+            const day = wibTime.getDay();
+            const hours = wibTime.getHours();
+            const minutes = wibTime.getMinutes().toString().padStart(2, '0');
+
+            const daysID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const timeDisplay = document.getElementById('current-time-display');
+            const statusBadge = document.getElementById('store-status-badge');
+
+            if (timeDisplay) {
+                timeDisplay.textContent = `${daysID[day]}, ${hours.toString().padStart(2, '0')}:${minutes} WIB`;
+            }
+
+            const isOpen = hours >= 10 && hours < 22;
+
+            if (statusBadge) {
+                if (isOpen) {
+                    statusBadge.className = "inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800";
+                    statusBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span><span>BUKA SEKARANG</span>`;
+                } else {
+                    statusBadge.className = "inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-red-100 text-red-800";
+                    statusBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span>TUTUP (Buka 10:00 WIB)</span>`;
+                }
+            }
+        }
+
+        // =========================================================================
+        // 10. INISIALISASI APLIKASI SAAT HALAMAN DIMUAT
+        // =========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            initBrowserSession();
+            loadAccountFromCookie();
+            loadOrdersFromCookie();
+            loadCartFromSession();
+
+            renderMenu('semua');
+            updateCartUI();
+            updateStoreStatus();
+            startAutoDeliverySimulation();
+            setInterval(updateStoreStatus, 60000);
+        });
+    </script>
+</body>
+</html>
